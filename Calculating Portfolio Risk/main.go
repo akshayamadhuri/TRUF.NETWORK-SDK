@@ -40,9 +40,9 @@ func main() {
 	}
 
 	// Define the Truflation Stream ID and Provider Address
-	streamID := util.GenerateStreamId("stf37ad83c0b92c7419925b7633c0e62") // Correct Stream ID
-	providerAddress := "0x4710a8d8f0d845da110086812a32de6d90d7ff5c"       // Correct Provider Address
-	log.Printf("Attempting to load stream with ID: %s and provider: %s", streamID, providerAddress)
+	streamID := util.GenerateStreamId("stf37ad83c0b92c7419925b7633c0e62")
+	providerAddress := "0x4710a8d8f0d845da110086812a32de6d90d7ff5c"
+	log.Printf("Fetching stream: %s with provider: %s", streamID, providerAddress)
 
 	// Fetch data for the stream
 	data := fetchData(ctx, tnClient, streamID, providerAddress)
@@ -57,7 +57,7 @@ func main() {
 }
 
 // Helper Function: Fetch Data for a Single Stream
-func fetchData(ctx context.Context, tnClient *tnclient.Client, streamID util.StreamId, providerAddress string) []types.StreamRecord {
+func fetchData(ctx context.Context, tnClient *tnclient.Client, streamID util.StreamId, providerAddress string) []map[string]interface{} {
 	// Create EthereumAddress using NewEthereumAddressFromString
 	dataProvider, err := util.NewEthereumAddressFromString(providerAddress)
 	if err != nil {
@@ -70,8 +70,8 @@ func fetchData(ctx context.Context, tnClient *tnclient.Client, streamID util.Str
 
 	log.Printf("Fetching stream: %s with provider: %s", streamID, providerAddress)
 	streamLocator := types.StreamLocator{
-		StreamId:     streamID,     // Use the updated stream ID
-		DataProvider: dataProvider, // Use the updated EthereumAddress
+		StreamId:     streamID,
+		DataProvider: dataProvider,
 	}
 	stream, err := tnClient.LoadPrimitiveStream(streamLocator)
 	if err != nil {
@@ -87,21 +87,42 @@ func fetchData(ctx context.Context, tnClient *tnclient.Client, streamID util.Str
 		log.Fatalf("Failed to fetch records for stream %s: %v", streamID, err)
 	}
 
-	return records
+	// Process records: scale values and filter non-finite values
+	var processedRecords []map[string]interface{}
+	for _, record := range records {
+		value, err := record.Value.Float64()
+		if err != nil {
+			log.Printf("Non-finite value encountered. Skipping record: %+v", record)
+			continue
+		}
+		// Scale up the value for better readability (adjust as needed)
+		scaledValue := value * 1e18 // Adjust scaling factor if needed
+
+		// Log the processed value for debugging
+		log.Printf("Processed record: Date=%v, ScaledValue=%f", record.DateValue, scaledValue)
+
+		// Append the processed record as a map
+		processedRecords = append(processedRecords, map[string]interface{}{
+			"Date":  record.DateValue,
+			"Value": scaledValue,
+		})
+	}
+
+	return processedRecords
 }
 
 // Helper Function: Calculate Risk Metrics
-func calculateRiskMetrics(data []types.StreamRecord) map[string]float64 {
+func calculateRiskMetrics(data []map[string]interface{}) map[string]float64 {
 	riskMetrics := make(map[string]float64)
 
 	// Example: Calculate Value-at-Risk (VaR) based on inflation data
 	var sum float64
 	for _, record := range data {
-		value, _ := record.Value.Float64()
+		value := record["Value"].(float64)
 		sum += value
 	}
 	if len(data) > 0 {
-		riskMetrics["VaR"] = sum / float64(len(data)) // Simple average (example)
+		riskMetrics["VaR"] = sum / float64(len(data)) // Simple average
 	}
 
 	return riskMetrics
@@ -109,7 +130,10 @@ func calculateRiskMetrics(data []types.StreamRecord) map[string]float64 {
 
 // Helper Function: Generate Alerts
 func generateAlerts(riskMetrics map[string]float64) {
-	if VaR, exists := riskMetrics["VaR"]; exists && VaR > 1000 { // Example threshold
+	threshold := 1000.0 // Set a lower threshold for testing
+	if VaR, exists := riskMetrics["VaR"]; exists && VaR > threshold {
 		fmt.Printf("ALERT: Portfolio Value-at-Risk exceeds threshold! VaR: %.2f\n", VaR)
+	} else {
+		log.Printf("No alert triggered. VaR: %.2f", riskMetrics["VaR"])
 	}
 }
