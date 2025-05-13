@@ -1,6 +1,6 @@
-1. Clone the repo
+Clone the repo
 
-2.install TRUF.NETWORK SDK 
+install TRUF.NETWORK SDK 
 ```
 go get github.com/trufnetwork/sdk-go
 ```
