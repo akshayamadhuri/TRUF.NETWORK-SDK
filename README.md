@@ -1,123 +1,122 @@
-# 📊 TRUF.Network Inflation & Index Risk Analyzer
+# 📊 TRUF.Network Inflation & Risk Analyzer
 
-Analyze real-time inflation and index data from TRUF.Network using Go. This project fetches decentralized economic data streams, computes simplified Value-at-Risk (VaR), and raises alerts when risks exceed thresholds.
+Analyze real-time inflation and index data from TRUF.Network. This repository contains modular components and a combined script to track economic data and compute portfolio risk.
 
----
 
-## 🧱 Features
+## ⚙ Prerequisites
 
-- Fetch real-time inflation and index data from TRUF.Network
-- Compute basic risk metrics (average-based VaR)
-- Alert on elevated risk levels
-- Modular and readable code
-- Powered by the official TRUF Go SDK
+- Go (v1.20+)
+- Git
 
----
+You will also need a `.env` file in the root with your credentials:
 
-## 📦 Prerequisites
+```env
+PRIVATE_KEY=your_private_key
+WALLET_ADDRESS=your_wallet_address
+```
 
-Make sure you have:
-
-- **Go** (v1.20 or later)
-- **Git**
-- **A text editor** (e.g., VS Code)
-- **A `.env` file** with your TRUF Ethereum wallet `PRIVATE_KEY` and `WALLET_ADDRESS`
-- **Internet connection** to reach [https://staging.tsn.truflation.com](https://staging.tsn.truflation.com)
+> **Warning**
+> Never share your private key publicly!
 
 ---
 
-## 🚀 Getting Started
+##  Getting Started
 
 ### 1. Clone the Repository
 
 ```bash
 git clone https://github.com/akshayamadhuri/TRUF.NETWORK-SDK.git
-cd truf-inflation-risk-analyzer
+cd TRUF.NETWORK-SDK
 ```
 
-### 2. Create a `.env` File
+### 2. Set Up Your Environment
+
+Create a `.env` file in the root directory:
 
 ```env
-PRIVATE_KEY=your_private_key_here
-WALLET_ADDRESS=your_wallet_address_here
+PRIVATE_KEY=your_private_key
+WALLET_ADDRESS=your_wallet_address
 ```
 
-> 🔐 **Important:** Never share your private key publicly!  
-> You can generate your key from MetaMask or any Ethereum wallet.
+### 3. Initialize Go Module
 
----
-
-## ⚙️ Setup and Installation
-
-### 3. Initialize Go Module (if not already)
+If running for the first time:
 
 ```bash
 go mod init truf-inflation-risk-analyzer
 ```
 
-### 4. Install Dependencies
+Then fetch dependencies:
 
 ```bash
 go get github.com/trufnetwork/sdk-go
 go get github.com/joho/godotenv
 go get github.com/kwilteam/kwil-db/core/crypto
 go get github.com/kwilteam/kwil-db/core/crypto/auth
-go get github.com/golang-sql/civil
-```
-
-### 5. Tidy Up
-
-This will generate your `go.sum` and finalize `go.mod`:
-
-```bash
 go mod tidy
 ```
 
 ---
 
-## 🧠 Project Structure
+##  Run Individual Modules
 
+Each folder contains its own `main.go` file—you can run each part independently.
+
+###  Inflation Tracker
+
+```bash
+cd Inflation-Tracker
+go run main.go
 ```
-.
-├── main.go            # Main application logic
-├── go.mod             # Go module file
-├── go.sum             # Dependency checksums
-└── .env               # Environment variables (not checked into Git)
+
+###  Index Stream
+
+```bash
+cd 'Index value'
+go run mai.go
+```
+
+###  Risk Calculator
+
+```bash
+cd 'Calculating Portfolio Risk'
+go run main.go
 ```
 
 ---
 
-## 🔧 Usage
+##  Run Combined Script
 
-Run the program using:
+To test the complete end-to-end functionality, use:
 
 ```bash
-go run main.go
+go run combined\ main.go
 ```
 
 This will:
 
-- Load your `.env` variables
+- Load environment variables
 - Connect to TRUF.Network
-- Fetch inflation and index data
-- Calculate VaR
-- Print alerts if risk is too high
+- Fetch both inflation & index values
+- Calculate simplified Value-at-Risk (VaR)
+- Print alerts if needed
 
 ---
 
-## 📈 Sample Output
+## 🔎 Example Output
 
-```bash
+```yaml
 Inflation Data:
-Date (DateValue): 2023-01-03, Value: 31274.80
+Date: 2023-01-01, Value: 30245.67
 ...
 
-Inflation Risk Metrics: map[VaR:28502.3363]
+Risk Metrics: map[VaR:28502.3363]
 ALERT: Portfolio Value-at-Risk exceeds threshold! VaR: 28502.34
 ```
 
+
+## 🤝 Contributing
+
+Pull requests are welcome! For major changes, please open an issue first to discuss what you would like to change.
+
 ---
-
-## 📝 License
-
-Distributed under the MIT License. See `LICENSE` for more information.
