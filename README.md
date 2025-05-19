@@ -31,7 +31,7 @@ Make sure you have:
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/truf-inflation-risk-analyzer.git
+git clone https://github.com/akshayamadhuri/TRUF.NETWORK-SDK.git
 cd truf-inflation-risk-analyzer
 ```
 
